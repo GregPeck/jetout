@@ -45,6 +45,20 @@ Not one image and not one sample: the unicorn, the rings, the twelve skylines an
 the neon title are canvas paths redrawn every frame, and the music is generated
 through the Web Audio API.
 
+## The stages
+
+Twelve worlds, then an endless run that cycles through them all.
+
+| **Forest** | **Factory** | **Candyland** |
+|---|---|---|
+| ![Forest](screenshots/01-forest.png) | ![Factory](screenshots/02-factory.png) | ![Candyland](screenshots/03-candyland.png) |
+| **Seabed** | **Desert** | **City** |
+| ![Seabed](screenshots/04-seabed.png) | ![Desert](screenshots/05-desert.png) | ![City](screenshots/06-city.png) |
+| **Icefield** | **Jungle** | **Beach** |
+| ![Icefield](screenshots/07-icefield.png) | ![Jungle](screenshots/08-jungle.png) | ![Beach](screenshots/09-beach.png) |
+| **Volcano** | **Neon Grid** | **Orbital Station** |
+| ![Volcano](screenshots/10-volcano.png) | ![Neon Grid](screenshots/11-neon-grid.png) | ![Orbital Station](screenshots/12-orbital-station.png) |
+
 ## This repository
 
 `index.html` is the source — readable, commented, unminified. It is the file to
