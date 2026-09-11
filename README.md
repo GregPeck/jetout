@@ -37,8 +37,8 @@ you'll still be burning in orbit.
   jungle, beach, volcano, neon grid, orbital station, then an endless run that
   cycles through them all and never stops getting faster.
 - **13 original tunes**, one per world plus the title theme.
-- **7 power-ups** that stack freely and extend when picked up again: SHIELD,
-  MAGNET, DOUBLE, TURBO, SLOW, RUSH, and the HEART.
+- **6 power-ups** that stack freely and extend when picked up again: SHIELD,
+  MAGNET, DOUBLE, TURBO, RUSH, and the SUPER RING.
 - Zappers, wind gusts and homing missiles, meaner the deeper you go.
 
 Not one image and not one sample: the unicorn, the rings, the twelve skylines and
