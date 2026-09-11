@@ -2474,14 +2474,14 @@ function drawFrame() {
 		x = uniX + e.x - X
 		if (e.k) {                                     // a shockwave opening and fading
 			C.strokeStyle = 'hsla(' + e.h + ',100%,72%,' + e.l + ')'
-			C.lineWidth = 2 + e.l * 4
+			C.lineWidth = uniSize * (.010 + e.l * .021)
 			C.beginPath()
 			C.arc(x, e.y, (1 - e.l) * uniSize * (e.k > 1 ? .95 : .6), 0, 7)
 			C.stroke()
 		} else {
 			C.fillStyle = 'hsla(' + e.h + ',95%,66%,' + e.l + ')'
 			C.beginPath()
-			C.arc(x, e.y, 3 + e.l * 8, 0, 7)
+			C.arc(x, e.y, uniSize * (.016 + e.l * .042), 0, 7)
 			C.fill()
 		}
 	}
