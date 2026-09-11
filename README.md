@@ -6,7 +6,7 @@ An entry for [js13kGames 2026](https://js13kgames.com), theme *Unicorns and
 Rainbows*. Fly her across 13 stages, from a sunlit forest to an orbital station,
 and see how far you can get before the rainbow runs dry.
 
-**13 276 bytes** of the 13 312 allowed. Landscape only, desktop and mobile.
+**13 308 bytes** of the 13 312 allowed. Landscape only, desktop and mobile.
 
 ## Controls
 
@@ -21,7 +21,7 @@ One button, held or not. Everything else is timing.
 
 ## The one thing to understand
 
-The rainbow behind her is the gauge at the top of the screen, and it is the only
+The rainbow behind her is the clock at the top of the screen, and it is the only
 resource in the game.
 
 - Every ring you fly through is **+0.5 s**, doubled while the DOUBLE gem runs.
