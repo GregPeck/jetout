@@ -6,7 +6,7 @@ An entry for [js13kGames 2026](https://js13kgames.com), theme *Unicorns and
 Rainbows*. Fly her across 13 stages, from a sunlit forest to an orbital station,
 and see how far you can get before the rainbow runs dry.
 
-**13 308 bytes** of the 13 312 allowed. Landscape only, desktop and mobile.
+**13 302 bytes** of the 13 312 allowed. Landscape only, desktop and mobile.
 
 ## Controls
 

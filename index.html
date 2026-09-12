@@ -68,7 +68,7 @@ var dist, best, timeLeft, shake
 // 0 flying in from the left   1 playing   2 flying out to the right
 // 3 black falls on the stage we leave   4 the title, on black
 var stage, stagePhase, phaseTime, stageStartX, endless, uniDrawX
-var seamFrom = -1                              // ESSAI : le monde qu on quitte pendant la couture, -1 si aucune
+var seamFrom = -1                              // the world being left while the seam crosses, -1 for none
 var stageLen = 60000  // 1000 metres, the length of one stage
 // Each world's own hazard, on top of the common ones:
 // 1 falling blocks   2 updraft column
@@ -78,12 +78,13 @@ var worldHazard = [0, 1, 0, 2, 1, 0, 1, 0, 0, 1, 2, 2]
 // the stage carousel on the title screen: where it sits, where it is
 // heading, and the drag in progress
 var carPos = 0, carAim = 0, dragging, dragX0, dragFrom, dragDist
-// the gems: colour, name, duration. gemTime[k] is each one's remaining time,
-// they run in parallel and stack freely.
+// the timed gems: colour and duration. gemTime[k] is each one's remaining time,
+// they run in parallel and stack freely. Number 5, the super ring, is not one of
+// them: it pays out at once and has no gauge.
 var gemTime
-var gemColour = ['#ff4d5e', '#4dff88', '#4dc8ff', '#ff8c1a', '#ffd21f', '#12d6a0']
-var gemDur = [6, 7, 8, 5, 6, 0]   // the heart has no duration: it grants a life
-// draw table: the first ones come up more often than the heart
+var gemColour = ['#ff4d5e', '#4dff88', '#4dc8ff', '#ff8c1a', '#ffd21f']
+var gemDur = [6, 7, 8, 5, 6]
+// draw table: the first ones come up more often than the super ring
 var gemDraw = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5]
 
 // Reading localStorage THROWS when the browser is set to refuse site data, and
@@ -284,9 +285,9 @@ var WAVE = ['sine', 'triangle', 'square', 'sawtooth']
 var FILT = [0, 'lowpass', 'highpass', 'bandpass']
 // the four colours of a coin, from the widest ring to the glint
 var COIN = ['#ffcf4d42', '#b8801a', '#ffcf4d', '#fff6cf']
-// Le bonus de temps n est plus une gemme mais un anneau geant, dans la couleur
-// qui etait celle du coeur : on comprend sans explication que c est un anneau
-// hors du commun.
+// The time bonus is no longer a gem but a giant ring, in what used to be the
+// heart's colour: nothing needs explaining, you can see it is a ring and you can
+// see it is out of the ordinary.
 var BIGRING = ['#12d6a042', '#0a7a5b', '#12d6a0', '#c8fdec']
 
 // A number packed into one character, 48 being zero. Code 44 is never emitted:
@@ -466,7 +467,7 @@ function resetRun(fromStage) {
 	genEdge = X + W * .8
 
 	// gems, and the slow motion / turbo pair, all back to neutral
-	gemTime = [0, 0, 0, 0, 0, 0]
+	gemTime = [0, 0, 0, 0, 0]
 	invuln = 0
 	turboRate = 1
 	worldTime = 0
@@ -527,8 +528,8 @@ function addCoinRun(startX) {
 // electric bars, coin runs and gems as it goes.
 function buildWorldAhead() {
 	var k, y, i, n, w
-	// En mode infini on ne laisse pas la fin d etape vide : sans cela, une demi
-	// largeur d ecran sans rien se verrait pile a la couture entre deux mondes.
+	// The endless mode never leaves the end of a stage empty: without this, half a
+	// screen of nothing would land exactly on the seam between two worlds.
 	while (genEdge < X + W * 2.2 && (endless || genEdge < stageStartX + stageLen - W * .5)) {
 		k = endless ? 0 : M.random()   // in endless mode, not a single coin or gem
 		if (k < .28 + M.min(.15, stage * .011)) {
@@ -1069,11 +1070,11 @@ function updateGame(dt) {
 	X += scrollNow * dt
 	dist = (X / 60)|0
 	if (X - stageStartX >= stageLen) {                              // end of stage
-		// ESSAI : en mode infini les mondes s enchainent sans pause. Pas de sortie
-		// par la droite, pas de fondu au noir, pas de carton de titre : le decor
-		// change sous elle et elle continue de voler.
+		// In the endless mode the worlds run on without a pause. No flying out to the
+		// right, no fade to black, no stage card: the scenery changes beneath her and
+		// she keeps flying.
 		if (endless) {
-			seamFrom = stage                     // il reste visible a gauche de la frontiere
+			seamFrom = stage                     // it stays visible left of the seam
 			stage++
 			stageStartX = X
 			return
@@ -1274,8 +1275,8 @@ function updateGame(dt) {
 		dx = X - uniSize * .06 - item.x
 		dy = Y - item.y
 		if (dx * dx + dy * dy < (uniSize * .62) * (uniSize * .62)) {
-			if (item.k == 6) {
-				addLife()                    // the heart: same sound as 250 coins
+			if (item.k == 5) {
+				addLife()                    // the super ring: eighteen seconds at once
 			} else {
 				gemTime[item.k] = M.min(gemDur[item.k] * 1.8, gemTime[item.k] + gemDur[item.k])      // picking the same gem again extends it
 				playSound(520, 780, .10, 'triangle', .16)
@@ -2082,11 +2083,11 @@ function drawStageCard(stageNo) {
 		return
 	}
 	// size and opacity follow the distance to the centre, with no step
-	// tout le texte de la vignette suit la hauteur de l ecran, comme le reste du jeu
+	// every word on the card follows the height of the display, like the rest
 	var ts = M.max(15, H * .039)
 	var g = getStartTime(stageNo) > 0, k = stageNo % worlds.length, d = M.min(1, M.abs(stageNo - carPos))
 	var w = cardW * .86 * (1 - d * .22), h = w * H / W
-	var cx = W / 2 + (stageNo - carPos) * cardW, cy = H * .47, px = cx - w / 2, py = cy - h / 2, sx
+	var cx = W / 2 + (stageNo - carPos) * cardW, cy = H * .554, px = cx - w / 2, py = cy - h / 2, sx
 	if (cx < -w || cx > W + w) {
 		return
 	}
@@ -2179,27 +2180,27 @@ function drawCoin(cx, cy, size, spin, cols) {
 	}
 }
 
-// ESSAI, mode infini : deux mondes se partagent l ecran pendant que la frontiere
-// le traverse. Celui qu on quitte a gauche du trait, celui qu on gagne a droite.
-// Tout est dessine depuis la position dans le monde, donc un simple decoupage
-// suffit : aucune des deux fonctions de decor n a besoin de le savoir.
-function paintSplit(paint, seam, gauche, droite) {
+// Endless mode: two worlds share the screen while the seam crosses it, the one
+// being left to the left of the line and the one being entered to the right.
+// Everything is drawn from the position in the world, so a clip is enough:
+// neither scenery function needs to know it is being cut in half.
+function paintSplit(paint, seam, left, right) {
 	C.save()
 	C.beginPath()
 	C.rect(0, 0, seam, H)
 	C.clip()
-	paint(gauche)
+	paint(left)
 	C.restore()
 	C.save()
 	C.beginPath()
 	C.rect(seam, 0, W - seam, H)
 	C.clip()
-	paint(droite)
+	paint(right)
 	C.restore()
 }
 
-// Renvoie l abscisse de la frontiere si elle est a l ecran, sinon -1, et range
-// dans seamSides les deux mondes a peindre.
+// Returns where the seam falls on screen, or -1 when it is off screen, and
+// leaves the two worlds to paint in seamSides.
 var seamSides = [0, 0]
 function seamAt() {
 	var s
@@ -2519,7 +2520,7 @@ function drawFrame() {
 	C.roundRect(W / 2 - q / 2 - ceilY * .35, ceilY * .14, q + ceilY * .7, ceilY * .74, ceilY * .18)
 	C.fill()
 	C.textAlign = 'center'
-	C.fillStyle = timeLeft < 10 && M.sin(now * .012) > 0 ? '#ff5555' : '#fff'
+	C.fillStyle = timeLeft < 10 && M.sin(now * .012) > 0 ? '#f55' : '#fff'
 	C.fillText(t, W / 2, ceilY * .72)
 	C.textAlign = 'right'
 	C.fillStyle = '#fff'
@@ -2556,8 +2557,7 @@ function drawFrame() {
 				C.roundRect(x - g / 2 - ceilY * .1, H - ceilY * .8, g + ceilY * .2, ceilY * .6, ceilY * .12)
 				C.fill()
 				C.fillStyle = gemColour[i]
-				C.fillText(['SHIELD', 'MAGNET', 'DOUBLE', 'TURBO', 'RUSH', 'HEART'][i], x, H - ceilY * .55)
-				C.fillStyle = gemColour[i]
+				C.fillText(['SHIELD', 'MAGNET', 'DOUBLE', 'TURBO', 'RUSH'][i], x, H - ceilY * .55)
 				C.fillRect(x - g / 2, H - ceilY * .38, g * M.min(1, gemTime[i] / gemDur[i]), ceilY * .13)
 			}
 		}
@@ -2596,9 +2596,13 @@ function drawFrame() {
 			drawStageCard(q + j)
 		}
 		drawStageCard(q)
-		// Une licorne passe le long du bord bas de temps en temps : l ecran d accueil
-		// ne doit rien a la partie, mais il n a pas a etre une image fixe. flyBlend
-		// decide des pattes repliees ou marchantes : on le force, puis on le rend.
+		// The whole point of the game is how far you get, so the figure belongs on the
+		// screen where you decide to play, not only on the one before it.
+		if (best) {
+			C.fillStyle = '#c8bff0'
+			C.font = 'bold ' + (M.max(13, H * .042) | 0) + 'px sans-serif'
+			C.fillText('BEST ' + best + ' m', W / 2, H * .265)
+		}
 		drawWalker()
 	}
 
